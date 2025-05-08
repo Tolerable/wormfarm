@@ -492,6 +492,21 @@ document.createElement = function(tagName) {
 				<div class="config-tab" data-tab="about">About</div>
 				<div class="config-tab" data-tab="support">Support</div>
             </div>
+
+			<!-- Config Path Selector -->
+			<h2>Configuration Source</h2>
+			<div class="form-group">
+				<label for="config-path">Configuration File Path</label>
+				<div style="display: flex; gap: 10px; margin-bottom: 10px;">
+					<input type="text" id="config-path" placeholder="Path to config.js (e.g., js/config.js)" style="flex: 1;">
+					<button type="button" class="btn" id="load-config-btn">Load Config</button>
+				</div>
+				<div id="detected-configs" style="margin-top: 10px;">
+					<p>Detected configurations:</p>
+					<div id="config-options" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;"></div>
+				</div>
+				<p class="help-text">Select a detected configuration or enter a custom path to your config.js file.</p>
+			</div>
             
             <!-- Basic Info Section -->
             <div class="config-section active" id="basic-section">
@@ -3672,68 +3687,201 @@ document.createElement = function(tagName) {
 				function loadExistingConfig() {
 					console.log("Attempting to load existing config.js...");
 					
-					// Try to load from CURRENT DIRECTORY ONLY if not already loaded
+					// Check if a path was previously saved in localStorage
+					const savedConfigPath = localStorage.getItem('savedConfigPath');
+					
+					// Only attempt to load if not already loaded
 					if (typeof window.siteConfig === 'undefined') {
-						// First try direct path that should work on GitHub Pages
-						const configPath = 'js/config.js';
+						// Common paths to try
+						const possiblePaths = [
+							// Local path - works for standard setups
+							'js/config.js',
+							
+							// Path based on current location
+							window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1) + 'js/config.js',
+							
+							// For /SITEPACKAGES/PUB/USERNAME/ structure
+							'/SITEPACKAGES/PUB/' + window.location.hostname.split('.')[0] + '/js/config.js',
+							
+							// For direct /SITEPACKAGES/ structure
+							'/SITEPACKAGES/js/config.js',
+							
+							// For username.github.io/reponame structure
+							'/' + window.location.pathname.split('/')[1] + '/js/config.js',
+							
+							// Absolute from domain root
+							'/js/config.js',
+							
+							// One level up (for setups in subdirectories)
+							'../js/config.js'
+						];
 						
-						console.log("Looking for config at:", configPath);
-						
-						const configScript = document.createElement('script');
-						configScript.src = configPath;
-						
-						configScript.onload = function() {
-							console.log('Successfully loaded config.js:', configPath);
-							
-							// Only populate if config was found
-							if (window.siteConfig) {
-								populateFormFromConfig(window.siteConfig);
-							} else {
-								console.warn("Config file loaded but siteConfig object not found");
-							}
-						};
-						
-						configScript.onerror = function() {
-							console.error('Failed to load config.js from:', configPath);
-							
-							// Fallback to dynamically calculated path
-							const currentPath = window.location.pathname;
-							const dirPath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
-							const fallbackPath = dirPath + 'js/config.js';
-							
-							console.log("Trying fallback path:", fallbackPath);
-							
-							const fallbackScript = document.createElement('script');
-							fallbackScript.src = fallbackPath;
-							
-							fallbackScript.onload = function() {
-								console.log('Successfully loaded config.js from fallback path:', fallbackPath);
-								if (window.siteConfig) {
-									populateFormFromConfig(window.siteConfig);
+						// If we have a saved path, try it first
+						if (savedConfigPath) {
+							console.log("Using previously saved config path:", savedConfigPath);
+							loadConfigFromPath(savedConfigPath, function(success) {
+								if (!success) {
+									// If saved path failed, try to detect configs
+									detectConfigs(possiblePaths);
 								}
-							};
-							
-							fallbackScript.onerror = function() {
-								console.error('Failed to load config.js from fallback path:', fallbackPath);
-								// Create default config
-								window.siteConfig = {
-									// Default values
-									site: {
-										name: "Site Configuration",
-										tagline: "Configure your site",
-										// other defaults...
-									}
-								};
-								console.warn("Using default config values");
-							};
-							
-							document.head.appendChild(fallbackScript);
-						};
+							});
+						} else {
+							// Otherwise try to detect configs
+							detectConfigs(possiblePaths);
+						}
 						
-						document.head.appendChild(configScript);
+						// Add event listener to the load button
+						const loadConfigBtn = document.getElementById('load-config-btn');
+						if (loadConfigBtn) {
+							loadConfigBtn.addEventListener('click', function() {
+								const configPath = document.getElementById('config-path').value;
+								if (configPath) {
+									loadConfigFromPath(configPath);
+								}
+							});
+						}
+						
 						return false;
 					}
 					return true;
+				}
+
+				// Function to detect configs from multiple paths
+				function detectConfigs(paths) {
+					const configOptions = document.getElementById('config-options');
+					if (configOptions) {
+						configOptions.innerHTML = '<div class="loading">Detecting configurations...</div>';
+					}
+					
+					const detectedConfigs = [];
+					let detectionComplete = 0;
+					
+					// Check each path
+					paths.forEach(function(path) {
+						checkConfigExists(path, function(exists) {
+							detectionComplete++;
+							
+							if (exists) {
+								detectedConfigs.push(path);
+							}
+							
+							// Once all paths have been checked
+							if (detectionComplete === paths.length) {
+								displayDetectedConfigs(detectedConfigs);
+								
+								// If only one config was found, use it automatically
+								if (detectedConfigs.length === 1) {
+									loadConfigFromPath(detectedConfigs[0]);
+								} 
+								// If no configs were found, show message
+								else if (detectedConfigs.length === 0) {
+									// Try to use a default config
+									console.error('No config.js files detected in common locations');
+									window.siteConfig = {
+										// Default values
+										site: {
+											name: "Site Configuration",
+											tagline: "Configure your site",
+											// Other defaults...
+										},
+										// Additional defaults...
+									};
+									console.warn("Using default config values");
+									
+									// Update the UI
+									if (configOptions) {
+										configOptions.innerHTML = '<div class="no-configs">No configuration files detected. Please enter a path manually.</div>';
+									}
+								}
+							}
+						});
+					});
+				}
+
+				// Function to check if a config exists at a given path
+				function checkConfigExists(path, callback) {
+					const fullPath = path.startsWith('http') ? path : window.location.origin + (path.startsWith('/') ? '' : '/') + path;
+					
+					// Use fetch to check if the file exists
+					fetch(fullPath, { method: 'HEAD' })
+						.then(response => {
+							callback(response.ok);
+						})
+						.catch(() => {
+							callback(false);
+						});
+				}
+
+				// Function to display detected configs
+				function displayDetectedConfigs(configs) {
+					const configOptions = document.getElementById('config-options');
+					if (!configOptions) return;
+					
+					if (configs.length === 0) {
+						configOptions.innerHTML = '<div class="no-configs">No configuration files detected. Please enter a path manually.</div>';
+						return;
+					}
+					
+					configOptions.innerHTML = '';
+					
+					configs.forEach(path => {
+						const configBtn = document.createElement('button');
+						configBtn.className = 'config-option-btn';
+						configBtn.textContent = path;
+						configBtn.style.padding = '8px 12px';
+						configBtn.style.backgroundColor = 'var(--primary-color)';
+						configBtn.style.color = 'var(--text-color)';
+						configBtn.style.border = 'none';
+						configBtn.style.borderRadius = '5px';
+						configBtn.style.cursor = 'pointer';
+						
+						configBtn.addEventListener('click', function() {
+							document.getElementById('config-path').value = path;
+							loadConfigFromPath(path);
+						});
+						
+						configOptions.appendChild(configBtn);
+					});
+				}
+
+				// Function to load config from a specific path
+				function loadConfigFromPath(path, callback) {
+					console.log("Loading config from path:", path);
+					
+					// First, reset any existing config
+					window.siteConfig = undefined;
+					
+					const configScript = document.createElement('script');
+					configScript.src = path;
+					
+					configScript.onload = function() {
+						console.log('Successfully loaded config.js from:', path);
+						
+						// Update the input field with the path
+						const configPathInput = document.getElementById('config-path');
+						if (configPathInput) {
+							configPathInput.value = path;
+						}
+						
+						// Save the path to localStorage for future use
+						localStorage.setItem('savedConfigPath', path);
+						
+						// Populate the form if config was found
+						if (window.siteConfig) {
+							populateFormFromConfig(window.siteConfig);
+							if (callback) callback(true);
+						} else {
+							console.warn("Config file loaded but siteConfig object not found");
+							if (callback) callback(false);
+						}
+					};
+					
+					configScript.onerror = function() {
+						console.error('Failed to load config.js from:', path);
+						if (callback) callback(false);
+					};
+					
+					document.head.appendChild(configScript);
 				}
 
 				// Add this function to populate form fields based on the loaded config
