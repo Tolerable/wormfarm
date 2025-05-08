@@ -177,6 +177,90 @@
                         "salePrice": 21.99
                     }
                 ]
+            },
+            "product-1746672311610": {
+                "id": "product-1746672311610",
+                "name": "WHITE CHICKEN EGGS",
+                "type": "Veggie Worms",
+                "status": "available",
+                "delivery": "physical",
+                "digitalContent": "",
+                "image": "product4.jpg",
+                "additionalImages": [],
+                "description": "WHITE CHICKEN EGGS [LOCAL ONLY]",
+                "variety": "Premium",
+                "rating": "4.6/5",
+                "origin": "Freerange",
+                "details": "WHITE CHICKEN EGGS [LOCAL ONLY]",
+                "notes": "Chickens are very fowl birds!",
+                "packOptions": [
+                    {
+                        "size": "6",
+                        "regularPrice": 5,
+                        "salePrice": 3.75
+                    },
+                    {
+                        "size": "12",
+                        "regularPrice": 10,
+                        "salePrice": 6.25
+                    }
+                ]
+            },
+            "product-1746672435452": {
+                "id": "product-1746672435452",
+                "name": "BROWN CHICKEN EGGS",
+                "type": "Veggie Worms",
+                "status": "available",
+                "delivery": "physical",
+                "digitalContent": "",
+                "image": "product5.jpg",
+                "additionalImages": [],
+                "description": "BROWN CHICKEN EGGS [LOCAL ONLY]",
+                "variety": "Premium",
+                "rating": "4.7/5",
+                "origin": "Freerange",
+                "details": "BROWN CHICKEN EGGS [LOCAL ONLY]",
+                "notes": "Brown chicken eggs are not dirty!",
+                "packOptions": [
+                    {
+                        "size": "6",
+                        "regularPrice": 7,
+                        "salePrice": 4.25
+                    },
+                    {
+                        "size": "12",
+                        "regularPrice": 14,
+                        "salePrice": 8
+                    }
+                ]
+            },
+            "product-1746672585809": {
+                "id": "product-1746672585809",
+                "name": "COLORED CHICKEN EGGS",
+                "type": "Growers Worms",
+                "status": "available",
+                "delivery": "physical",
+                "digitalContent": "",
+                "image": "product6.jpg",
+                "additionalImages": [],
+                "description": "COLORED CHICKEN EGGS [LOCAL ONLY]",
+                "variety": "Hybrid",
+                "rating": "4.9/5",
+                "origin": "Freerange",
+                "details": "COLORED CHICKEN EGGS [LOCAL ONLY]",
+                "notes": "Colors are natural and eggs are not dyed!",
+                "packOptions": [
+                    {
+                        "size": "6",
+                        "regularPrice": 9,
+                        "salePrice": 8.25
+                    },
+                    {
+                        "size": "12",
+                        "regularPrice": 18,
+                        "salePrice": 15.75
+                    }
+                ]
             }
         }
     },
