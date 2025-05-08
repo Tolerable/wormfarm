@@ -2321,8 +2321,9 @@ document.createElement = function(tagName) {
 					const inputs = packEl.querySelectorAll('input');
 					
 					const size = inputs[0].value;
-					const regularPrice = parseFloat(inputs[1].value);
-					const salePrice = parseFloat(inputs[2].value);
+					// Using toFixed(2) to ensure we have 2 decimal places
+					const regularPrice = parseFloat(parseFloat(inputs[1].value).toFixed(2));
+					const salePrice = parseFloat(parseFloat(inputs[2].value).toFixed(2));
 					
 					if (size && !isNaN(regularPrice) && !isNaN(salePrice)) {
 						packOptions.push({
@@ -2380,11 +2381,11 @@ document.createElement = function(tagName) {
 				packOption.className = 'pack-option';
 				packOption.style.cssText = 'background: rgba(10, 14, 23, 0.8); border: 1px solid var(--primary-color); border-radius: 5px; padding: 10px; margin-bottom: 10px; display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; align-items: center;';
 				
-				// Create a more compact layout for the inputs
+				// Create a more compact layout for the inputs - add step="0.01" to the price inputs
 				packOption.innerHTML = `
 					<input type="text" placeholder="Size (e.g. 3 Pack)" value="${pack ? pack.size : ''}" style="width: 100%; background: rgba(0,0,0,0.2); color: var(--text-color); border: 1px solid var(--primary-color);">
-					<input type="number" placeholder="Regular Price" value="${pack ? pack.regularPrice : ''}" style="width: 100%; background: rgba(0,0,0,0.2); color: var(--text-color); border: 1px solid var(--primary-color);">
-					<input type="number" placeholder="Sale Price" value="${pack ? pack.salePrice : ''}" style="width: 100%; background: rgba(0,0,0,0.2); color: var(--text-color); border: 1px solid var(--primary-color);">
+					<input type="number" step="0.01" placeholder="Regular Price" value="${pack ? pack.regularPrice : ''}" style="width: 100%; background: rgba(0,0,0,0.2); color: var(--text-color); border: 1px solid var(--primary-color);">
+					<input type="number" step="0.01" placeholder="Sale Price" value="${pack ? pack.salePrice : ''}" style="width: 100%; background: rgba(0,0,0,0.2); color: var(--text-color); border: 1px solid var(--primary-color);">
 					<button type="button" class="remove-pack-btn" style="height: 30px; width: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; background: var(--alert-color); color: white; border: none; cursor: pointer; padding: 0; font-size: 16px;">×</button>
 				`;
 				
