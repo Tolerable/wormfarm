@@ -1738,7 +1738,6 @@ document.createElement = function(tagName) {
 						imagePath = 'img/placeholder.jpg';
 					}
 					
-					// Simplify this completely - use the exact same approach for all statuses
 					let statusHTML;
 					
 					if (product.status === 'available') {
@@ -1776,7 +1775,7 @@ document.createElement = function(tagName) {
 					productList.appendChild(productItem);
 				});
 				
-				// Event listeners remain the same
+				// Add event listeners for edit and delete buttons
 				document.querySelectorAll('.edit-product-btn').forEach(btn => {
 					btn.addEventListener('click', function() {
 						const productId = this.getAttribute('data-product-id');
@@ -2274,7 +2273,7 @@ document.createElement = function(tagName) {
 				const productId = document.getElementById('product-id').value;
 				const productName = document.getElementById('product-name').value;
 				
-				// Get product type directly from the selected option's text content
+				// Get product type from the selected option's text content
 				const productTypeSelect = document.getElementById('product-type');
 				const selectedOption = productTypeSelect.options[productTypeSelect.selectedIndex];
 				const productType = selectedOption.textContent;
@@ -2283,7 +2282,7 @@ document.createElement = function(tagName) {
 				const productDelivery = document.getElementById('product-delivery').value;
 				const digitalContent = document.getElementById('digital-content').value;
 				
-				// FIXED: Strip "img/" prefix if it exists
+				// Strip "img/" prefix if it exists
 				let productImage = document.getElementById('product-image').value;
 				if (productImage.startsWith('img/')) {
 					productImage = productImage.substring(4);
@@ -2303,7 +2302,7 @@ document.createElement = function(tagName) {
 					return;
 				}
 				
-				// Get additional images - FIXED: Strip "img/" prefix if it exists
+				// Get additional images - Strip "img/" prefix if it exists
 				const additionalImages = [];
 				document.querySelectorAll('#additional-images input').forEach(input => {
 					if (input.value.trim()) {
@@ -2321,15 +2320,16 @@ document.createElement = function(tagName) {
 					const inputs = packEl.querySelectorAll('input');
 					
 					const size = inputs[0].value;
-					// Using toFixed(2) to ensure we have 2 decimal places
-					const regularPrice = parseFloat(parseFloat(inputs[1].value).toFixed(2));
-					const salePrice = parseFloat(parseFloat(inputs[2].value).toFixed(2));
+					// Parse the values as floats first
+					const regularPrice = parseFloat(inputs[1].value);
+					const salePrice = parseFloat(inputs[2].value);
 					
 					if (size && !isNaN(regularPrice) && !isNaN(salePrice)) {
 						packOptions.push({
 							size,
-							regularPrice,
-							salePrice
+							// Store the exact values with 2 decimal places
+							regularPrice: regularPrice.toFixed(2),
+							salePrice: salePrice.toFixed(2)
 						});
 					}
 				});
@@ -2381,11 +2381,26 @@ document.createElement = function(tagName) {
 				packOption.className = 'pack-option';
 				packOption.style.cssText = 'background: rgba(10, 14, 23, 0.8); border: 1px solid var(--primary-color); border-radius: 5px; padding: 10px; margin-bottom: 10px; display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; align-items: center;';
 				
-				// Create a more compact layout for the inputs - add step="0.01" to the price inputs
+				// Format the values with 2 decimal places for display
+				let regularPrice = '';
+				let salePrice = '';
+				
+				if (pack) {
+					// Handle both string and number formats for backward compatibility
+					regularPrice = typeof pack.regularPrice === 'string' ? 
+						pack.regularPrice : 
+						Number(pack.regularPrice).toFixed(2);
+						
+					salePrice = typeof pack.salePrice === 'string' ? 
+						pack.salePrice : 
+						Number(pack.salePrice).toFixed(2);
+				}
+				
+				// Create a more compact layout for the inputs
 				packOption.innerHTML = `
 					<input type="text" placeholder="Size (e.g. 3 Pack)" value="${pack ? pack.size : ''}" style="width: 100%; background: rgba(0,0,0,0.2); color: var(--text-color); border: 1px solid var(--primary-color);">
-					<input type="number" step="0.01" placeholder="Regular Price" value="${pack ? pack.regularPrice : ''}" style="width: 100%; background: rgba(0,0,0,0.2); color: var(--text-color); border: 1px solid var(--primary-color);">
-					<input type="number" step="0.01" placeholder="Sale Price" value="${pack ? pack.salePrice : ''}" style="width: 100%; background: rgba(0,0,0,0.2); color: var(--text-color); border: 1px solid var(--primary-color);">
+					<input type="number" step="0.01" placeholder="Regular Price" value="${regularPrice}" style="width: 100%; background: rgba(0,0,0,0.2); color: var(--text-color); border: 1px solid var(--primary-color);">
+					<input type="number" step="0.01" placeholder="Sale Price" value="${salePrice}" style="width: 100%; background: rgba(0,0,0,0.2); color: var(--text-color); border: 1px solid var(--primary-color);">
 					<button type="button" class="remove-pack-btn" style="height: 30px; width: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; background: var(--alert-color); color: white; border: none; cursor: pointer; padding: 0; font-size: 16px;">×</button>
 				`;
 				
