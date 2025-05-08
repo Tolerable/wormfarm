@@ -3608,6 +3608,17 @@ document.createElement = function(tagName) {
 					
 					// Wait a bit for config to load before continuing with the rest
 					setTimeout(() => {
+						// Add event listener to the load button
+						const loadConfigBtn = document.getElementById('load-config-btn');
+						if (loadConfigBtn) {
+							loadConfigBtn.addEventListener('click', function() {
+								const configPath = document.getElementById('config-path').value;
+								if (configPath) {
+									loadConfigFromPath(configPath);
+								}
+							});
+						}
+						
 						// Load saved values from localStorage (might be overridden by config.js)
 						// loadFormValues();
 						
@@ -3632,8 +3643,8 @@ document.createElement = function(tagName) {
 						// Add event listeners to category inputs
 						document.getElementById('category1').addEventListener('input', updateProductTypeDropdown);
 						document.getElementById('category2').addEventListener('input', updateProductTypeDropdown);
-						document.getElementById('category3').addEventListener('input', updateProductTypeDropdown);						
-	
+						document.getElementById('category3').addEventListener('input', updateProductTypeDropdown);
+						
 						document.querySelectorAll('.preset-theme').forEach(theme => {
 							theme.addEventListener('click', function() {
 								// Remove active class from all themes
@@ -3728,17 +3739,6 @@ document.createElement = function(tagName) {
 						} else {
 							// Otherwise try to detect configs
 							detectConfigs(possiblePaths);
-						}
-						
-						// Add event listener to the load button
-						const loadConfigBtn = document.getElementById('load-config-btn');
-						if (loadConfigBtn) {
-							loadConfigBtn.addEventListener('click', function() {
-								const configPath = document.getElementById('config-path').value;
-								if (configPath) {
-									loadConfigFromPath(configPath);
-								}
-							});
 						}
 						
 						return false;
