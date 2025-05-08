@@ -3742,7 +3742,8 @@ document.createElement = function(tagName) {
 						configOptions.innerHTML = '<div class="loading">Detecting configurations...</div>';
 					}
 					
-					const detectedConfigs = [];
+					// Use a Set to track unique paths
+					const uniquePathsSet = new Set();
 					let detectionComplete = 0;
 					
 					// Check each path
@@ -3751,11 +3752,14 @@ document.createElement = function(tagName) {
 							detectionComplete++;
 							
 							if (exists) {
-								detectedConfigs.push(path);
+								// Add to our set of unique paths
+								uniquePathsSet.add(path);
 							}
 							
 							// Once all paths have been checked
 							if (detectionComplete === paths.length) {
+								// Convert Set to Array for displaying
+								const detectedConfigs = Array.from(uniquePathsSet);
 								displayDetectedConfigs(detectedConfigs);
 								
 								// If only one config was found, use it automatically
