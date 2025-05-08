@@ -97,7 +97,7 @@
             "product-1746666545693": {
                 "id": "product-1746666545693",
                 "name": "FISHING WORMS",
-                "type": "Fishing Worms",
+                "type": "WORMS",
                 "status": "available",
                 "delivery": "physical",
                 "digitalContent": "",
@@ -107,25 +107,26 @@
                 "variety": "WORMS",
                 "rating": "4.8/5",
                 "origin": "Cultivated",
+                "rarity": "Common",
                 "details": "Given love and attention these worms have been a pleasure to raise and are most likely very eager to join you in your fishing endeavors. ",
                 "notes": "Do not try to give them a bedtime as it tends to upset them.",
                 "packOptions": [
                     {
                         "size": "1 Dozen",
-                        "regularPrice": 14.99,
-                        "salePrice": 11.99
+                        "regularPrice": "14.99",
+                        "salePrice": "11.99"
                     },
                     {
                         "size": "2 Dozen",
-                        "regularPrice": 28.98,
-                        "salePrice": 21.99
+                        "regularPrice": "28.98",
+                        "salePrice": "21.99"
                     }
                 ]
             },
             "product-1746667227962": {
                 "id": "product-1746667227962",
                 "name": "GARDEN WORMS",
-                "type": "Fishing Worms",
+                "type": "WORMS",
                 "status": "available",
                 "delivery": "physical",
                 "digitalContent": "",
@@ -135,25 +136,26 @@
                 "variety": "WORMS",
                 "rating": "4.8/5",
                 "origin": "Cultivated",
+                "rarity": "Uncommon",
                 "details": "Given lots of excitement and the chance to explore life underground these worms have experienced a rich and full life. ",
                 "notes": "Do not try to restrict their reading material or they may become snippy.",
                 "packOptions": [
                     {
                         "size": "1 Dozen",
-                        "regularPrice": 14.99,
-                        "salePrice": 11.99
+                        "regularPrice": "14.99",
+                        "salePrice": "11.99"
                     },
                     {
                         "size": "2 Dozen",
-                        "regularPrice": 28.98,
-                        "salePrice": 21.99
+                        "regularPrice": "28.98",
+                        "salePrice": "21.99"
                     }
                 ]
             },
             "product-1746667378831": {
                 "id": "product-1746667378831",
                 "name": "GROWING WORMS",
-                "type": "Fishing Worms",
+                "type": "WORMS",
                 "status": "available",
                 "delivery": "physical",
                 "digitalContent": "",
@@ -163,25 +165,26 @@
                 "variety": "WORMS",
                 "rating": "4.8/5",
                 "origin": "Cultivated",
+                "rarity": "Rare",
                 "details": "These worms are often called hippy worms but those that don't take the time to get to know them, be kind.",
                 "notes": "Do not offer them snacks just because they ask, they just have the munchies.",
                 "packOptions": [
                     {
                         "size": "1 Dozen",
-                        "regularPrice": 14.99,
-                        "salePrice": 11.99
+                        "regularPrice": "14.99",
+                        "salePrice": "11.99"
                     },
                     {
                         "size": "2 Dozen",
-                        "regularPrice": 28.98,
-                        "salePrice": 21.99
+                        "regularPrice": "28.98",
+                        "salePrice": "21.99"
                     }
                 ]
             },
             "product-1746672311610": {
                 "id": "product-1746672311610",
                 "name": "WHITE CHICKEN EGGS",
-                "type": "Veggie Worms",
+                "type": "EGGS",
                 "status": "available",
                 "delivery": "physical",
                 "digitalContent": "",
@@ -191,25 +194,26 @@
                 "variety": "EGGS",
                 "rating": "4.6/5",
                 "origin": "Freerange",
+                "rarity": "Common",
                 "details": "WHITE CHICKEN EGGS [LOCAL ONLY]",
                 "notes": "Chickens are very fowl birds!",
                 "packOptions": [
                     {
                         "size": "6",
-                        "regularPrice": 5,
-                        "salePrice": 3.75
+                        "regularPrice": "5.00",
+                        "salePrice": "3.75"
                     },
                     {
                         "size": "12",
-                        "regularPrice": 10,
-                        "salePrice": 6.25
+                        "regularPrice": "10.00",
+                        "salePrice": "6.25"
                     }
                 ]
             },
             "product-1746672435452": {
                 "id": "product-1746672435452",
                 "name": "BROWN CHICKEN EGGS",
-                "type": "Veggie Worms",
+                "type": "EGGS",
                 "status": "available",
                 "delivery": "physical",
                 "digitalContent": "",
@@ -219,25 +223,26 @@
                 "variety": "EGGS",
                 "rating": "4.7/5",
                 "origin": "Freerange",
+                "rarity": "Uncommon",
                 "details": "BROWN CHICKEN EGGS [LOCAL ONLY]",
                 "notes": "Brown chicken eggs are not dirty!",
                 "packOptions": [
                     {
                         "size": "6",
-                        "regularPrice": 7,
-                        "salePrice": 4.25
+                        "regularPrice": "7.00",
+                        "salePrice": "4.25"
                     },
                     {
                         "size": "12",
-                        "regularPrice": 14,
-                        "salePrice": 8
+                        "regularPrice": "14.00",
+                        "salePrice": "8.00"
                     }
                 ]
             },
             "product-1746672585809": {
                 "id": "product-1746672585809",
                 "name": "COLORED CHICKEN EGGS",
-                "type": "Veggie Worms",
+                "type": "EGGS",
                 "status": "available",
                 "delivery": "physical",
                 "digitalContent": "",
@@ -247,18 +252,19 @@
                 "variety": "EGGS",
                 "rating": "4.9/5",
                 "origin": "Freerange",
+                "rarity": "Rare",
                 "details": "COLORED CHICKEN EGGS [LOCAL ONLY]",
                 "notes": "Colors are natural and eggs are not dyed!",
                 "packOptions": [
                     {
                         "size": "6",
-                        "regularPrice": 9,
-                        "salePrice": 8.25
+                        "regularPrice": "9.00",
+                        "salePrice": "8.25"
                     },
                     {
                         "size": "12",
-                        "regularPrice": 18,
-                        "salePrice": 15.75
+                        "regularPrice": "18.00",
+                        "salePrice": "15.75"
                     }
                 ]
             }
