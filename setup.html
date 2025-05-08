@@ -697,23 +697,26 @@ document.createElement = function(tagName) {
             <div class="config-section" id="terminology-section">
                 <h2>Terminology</h2>
                 <p>Customize the terms used throughout your site.</p>
-                
-                <h3>Category Names</h3>
-                
-                <div class="form-group">
-                    <label for="category1">Category 1 (Equivalent to Indica)</label>
-                    <input type="text" id="category1" value="Premium Collection">
-                </div>
-                
-                <div class="form-group">
-                    <label for="category2">Category 2 (Equivalent to Sativa)</label>
-                    <input type="text" id="category2" value="Signature Series">
-                </div>
-                
-                <div class="form-group">
-                    <label for="category3">Category 3 (Equivalent to Hybrid)</label>
-                    <input type="text" id="category3" value="Hybrid Collection">
-                </div>
+								
+				<h3>Product Categories</h3>
+								
+				<div class="form-group">
+					<label for="category1">Category 1</label>
+					<input type="text" id="category1" value="Premium Collection">
+					<p class="help-text">Your primary product category</p>
+				</div>
+								
+				<div class="form-group">
+					<label for="category2">Category 2</label>
+					<input type="text" id="category2" value="Signature Series">
+					<p class="help-text">Your secondary product category</p>
+				</div>
+								
+				<div class="form-group">
+					<label for="category3">Category 3</label>
+					<input type="text" id="category3" value="Hybrid Collection">
+					<p class="help-text">Your tertiary product category</p>
+				</div>
                 
                 <h3>Product Terms</h3>
                 
@@ -903,9 +906,7 @@ document.createElement = function(tagName) {
 									<div class="form-group">
 										<label for="product-type" style="color: var(--secondary-color);">Product Type</label>
 										<select id="product-type">
-											<option value="category1">Premium Collection</option>
-											<option value="category2">Signature Series</option>
-											<option value="category3">Hybrid Collection</option>
+											<!-- Category options will be dynamically populated -->
 										</select>
 									</div>
 									
@@ -1807,13 +1808,46 @@ document.createElement = function(tagName) {
 				}
 			}
 
+			// Function to update product type dropdown with current terminology
+			function updateProductTypeDropdown() {
+				const productTypeSelect = document.getElementById('product-type');
+				if (!productTypeSelect) return;
+				
+				// Clear existing options
+				productTypeSelect.innerHTML = '';
+				
+				// Get current category terminology from inputs
+				const category1 = document.getElementById('category1').value || 'Category 1';
+				const category2 = document.getElementById('category2').value || 'Category 2';
+				const category3 = document.getElementById('category3').value || 'Category 3';
+				
+				// Add options
+				const option1 = document.createElement('option');
+				option1.value = 'category1';
+				option1.textContent = category1;
+				productTypeSelect.appendChild(option1);
+				
+				const option2 = document.createElement('option');
+				option2.value = 'category2';
+				option2.textContent = category2;
+				productTypeSelect.appendChild(option2);
+				
+				const option3 = document.createElement('option');
+				option3.value = 'category3';
+				option3.textContent = category3;
+				productTypeSelect.appendChild(option3);
+			}
+
 			function openProductEditor(product = null) {
 				const modal = document.getElementById('product-editor-modal');
 				if (!modal) {
 					console.error('Product editor modal not found in the DOM');
 					return;
 				}
-				
+
+				// Update product type dropdown with current terminology
+				updateProductTypeDropdown();
+	
 				const isNewProduct = !product;
 				
 				// Set form values safely
@@ -2226,10 +2260,12 @@ document.createElement = function(tagName) {
 				const productId = document.getElementById('product-id').value;
 				const productName = document.getElementById('product-name').value;
 				
-				// Get product type from the selected option
+				// Get product type directly from the selected option's text content
 				const productTypeSelect = document.getElementById('product-type');
 				const selectedOption = productTypeSelect.options[productTypeSelect.selectedIndex];
-				const productTypeValue = selectedOption.value;
+				const productType = selectedOption.textContent;
+				
+				const productStatus = document.getElementById('product-status').value;
 				
 				// Map the category value to the actual terminology
 				let productType;
@@ -3577,8 +3613,12 @@ document.createElement = function(tagName) {
 						
 						// Init About Section
 						initializeAboutSection();
-						
-						// Rest of your existing init code...
+
+						// Add event listeners to category inputs
+						document.getElementById('category1').addEventListener('input', updateProductTypeDropdown);
+						document.getElementById('category2').addEventListener('input', updateProductTypeDropdown);
+						document.getElementById('category3').addEventListener('input', updateProductTypeDropdown);						
+	
 						document.querySelectorAll('.preset-theme').forEach(theme => {
 							theme.addEventListener('click', function() {
 								// Remove active class from all themes
