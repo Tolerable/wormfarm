@@ -34,13 +34,13 @@
         "body": "'Exo 2', sans-serif"
     },
     "terminology": {
-        "category1": "Fishing Worms",
-        "category2": "Veggie Worms",
-        "category3": "Growers Worms",
-        "productTerm": "Worm",
-        "productPluralTerm": "Worms",
-        "packTerm": "Worm Pack",
-        "cartTerm": "Worm Box",
+        "category1": "WORMS",
+        "category2": "EGGS",
+        "category3": "MISC",
+        "productTerm": "Item",
+        "productPluralTerm": "Items",
+        "packTerm": "Items Pack",
+        "cartTerm": "Item Cart",
         "soldOutLabel": "UNAVAILABLE",
         "comingSoonLabel": "COMING SOON"
     },
