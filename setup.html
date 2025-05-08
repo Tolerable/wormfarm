@@ -3674,18 +3674,16 @@ document.createElement = function(tagName) {
 					
 					// Try to load from CURRENT DIRECTORY ONLY if not already loaded
 					if (typeof window.siteConfig === 'undefined') {
-						// Build path based on CURRENT URL ONLY - not relative paths
-						const currentPath = window.location.pathname;
-						const dirPath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
-						const configPath = dirPath + 'js/config.js';
+						// First try direct path that should work on GitHub Pages
+						const configPath = 'js/config.js';
 						
-						console.log("Looking for config at specific path:", configPath);
+						console.log("Looking for config at:", configPath);
 						
 						const configScript = document.createElement('script');
 						configScript.src = configPath;
 						
 						configScript.onload = function() {
-							console.log('Successfully loaded config.js from current directory:', configPath);
+							console.log('Successfully loaded config.js:', configPath);
 							
 							// Only populate if config was found
 							if (window.siteConfig) {
@@ -3697,11 +3695,39 @@ document.createElement = function(tagName) {
 						
 						configScript.onerror = function() {
 							console.error('Failed to load config.js from:', configPath);
-							// Create fallback config
-							window.siteConfig = {
-								// Default values remain unchanged...
+							
+							// Fallback to dynamically calculated path
+							const currentPath = window.location.pathname;
+							const dirPath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
+							const fallbackPath = dirPath + 'js/config.js';
+							
+							console.log("Trying fallback path:", fallbackPath);
+							
+							const fallbackScript = document.createElement('script');
+							fallbackScript.src = fallbackPath;
+							
+							fallbackScript.onload = function() {
+								console.log('Successfully loaded config.js from fallback path:', fallbackPath);
+								if (window.siteConfig) {
+									populateFormFromConfig(window.siteConfig);
+								}
 							};
-							console.warn("Using default config values");
+							
+							fallbackScript.onerror = function() {
+								console.error('Failed to load config.js from fallback path:', fallbackPath);
+								// Create default config
+								window.siteConfig = {
+									// Default values
+									site: {
+										name: "Site Configuration",
+										tagline: "Configure your site",
+										// other defaults...
+									}
+								};
+								console.warn("Using default config values");
+							};
+							
+							document.head.appendChild(fallbackScript);
 						};
 						
 						document.head.appendChild(configScript);
