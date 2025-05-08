@@ -104,7 +104,7 @@
                 "image": "product1.jpg",
                 "additionalImages": [],
                 "description": "WORMS BEST SUITED FOR FISHING USE",
-                "variety": "Premium",
+                "variety": "WORMS",
                 "rating": "4.8/5",
                 "origin": "Cultivated",
                 "details": "Given love and attention these worms have been a pleasure to raise and are most likely very eager to join you in your fishing endeavors. ",
@@ -125,7 +125,7 @@
             "product-1746667227962": {
                 "id": "product-1746667227962",
                 "name": "GARDEN WORMS",
-                "type": "Growers Worms",
+                "type": "Fishing Worms",
                 "status": "available",
                 "delivery": "physical",
                 "digitalContent": "",
@@ -153,7 +153,7 @@
             "product-1746667378831": {
                 "id": "product-1746667378831",
                 "name": "GROWING WORMS",
-                "type": "Growers Worms",
+                "type": "Fishing Worms",
                 "status": "available",
                 "delivery": "physical",
                 "digitalContent": "",
@@ -181,7 +181,7 @@
             "product-1746672311610": {
                 "id": "product-1746672311610",
                 "name": "WHITE CHICKEN EGGS",
-                "type": "Growers Worms",
+                "type": "Veggie Worms",
                 "status": "available",
                 "delivery": "physical",
                 "digitalContent": "",
@@ -209,7 +209,7 @@
             "product-1746672435452": {
                 "id": "product-1746672435452",
                 "name": "BROWN CHICKEN EGGS",
-                "type": "Growers Worms",
+                "type": "Veggie Worms",
                 "status": "available",
                 "delivery": "physical",
                 "digitalContent": "",
@@ -237,7 +237,7 @@
             "product-1746672585809": {
                 "id": "product-1746672585809",
                 "name": "COLORED CHICKEN EGGS",
-                "type": "Growers Worms",
+                "type": "Veggie Worms",
                 "status": "available",
                 "delivery": "physical",
                 "digitalContent": "",
