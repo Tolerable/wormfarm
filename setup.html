@@ -2269,7 +2269,6 @@ document.createElement = function(tagName) {
 				additionalImagesContainer.appendChild(imageField);
 			}
 
-			// Update saveProduct to include additional images
 			function saveProduct() {
 				// Get values from form
 				const productId = document.getElementById('product-id').value;
@@ -2279,18 +2278,6 @@ document.createElement = function(tagName) {
 				const productTypeSelect = document.getElementById('product-type');
 				const selectedOption = productTypeSelect.options[productTypeSelect.selectedIndex];
 				const productType = selectedOption.textContent;
-				
-				const productStatus = document.getElementById('product-status').value;
-				
-				// Map the category value to the actual terminology
-				let productType;
-				if (productTypeValue === 'category1') {
-					productType = window.siteConfig?.terminology?.category1 || 'Premium Collection';
-				} else if (productTypeValue === 'category2') {
-					productType = window.siteConfig?.terminology?.category2 || 'Signature Series';
-				} else if (productTypeValue === 'category3') {
-					productType = window.siteConfig?.terminology?.category3 || 'Hybrid Collection';
-				}
 				
 				const productStatus = document.getElementById('product-status').value;
 				const productDelivery = document.getElementById('product-delivery').value;
@@ -2306,6 +2293,7 @@ document.createElement = function(tagName) {
 				const productVariety = document.getElementById('product-variety').value;
 				const productRating = document.getElementById('product-rating').value;
 				const productOrigin = document.getElementById('product-origin').value;
+				const productRarity = document.getElementById('product-rarity').value;
 				const productDetails = document.getElementById('product-details').value;
 				const productNotes = document.getElementById('product-notes').value;
 				
@@ -2362,6 +2350,7 @@ document.createElement = function(tagName) {
 					variety: productVariety,
 					rating: productRating,
 					origin: productOrigin,
+					rarity: productRarity,
 					details: productDetails,
 					notes: productNotes,
 					packOptions: packOptions
