@@ -969,6 +969,25 @@ document.createElement = function(tagName) {
 									<div id="additional-images" style="max-height: 120px; overflow-y: auto; border: 1px solid var(--primary-color); border-radius: 5px; padding: 5px; background: rgba(0, 0, 0, 0.2);"></div>
 								</div>
 							</div>
+
+							<!-- Add this after the Additional Images section in the product editor modal -->
+							<div class="form-group">
+								<label for="product-enable-hover" style="color: var(--secondary-color);">Enable Hover Image</label>
+								<select id="product-enable-hover">
+									<option value="false" selected>No</option>
+									<option value="true">Yes</option>
+								</select>
+								<p style="font-size: 0.8rem; color: #aaa; margin-top: 3px;">Show an additional image when hovering over product card.</p>
+							</div>
+
+							<div class="form-group" id="hover-image-group" style="display: none;">
+								<label for="product-hover-image" style="color: var(--secondary-color);">Hover Image</label>
+								<select id="product-hover-image" style="width: 100%;">
+									<option value="">— First Additional Image —</option>
+									<!-- Options will be populated dynamically -->
+								</select>
+								<p style="font-size: 0.8rem; color: #aaa; margin-top: 3px;">If not selected, the first additional image will be used.</p>
+							</div>
 							
 							<!-- Right Column - Details and Options -->
 							<div style="background: rgba(10, 14, 23, 0.9); padding: 15px; border-radius: 10px; border: 1px solid var(--primary-color);">
@@ -1724,7 +1743,18 @@ document.createElement = function(tagName) {
 				const productList = document.getElementById('product-list');
 				productList.innerHTML = '';
 				
-				Object.values(products).forEach(product => {
+				// Convert to array and ensure display order
+				const productsArray = Object.values(products);
+				
+				// Sort products by displayOrder if it exists
+				productsArray.sort((a, b) => {
+					// Default to end of list if displayOrder is not set
+					const orderA = a.displayOrder !== undefined ? a.displayOrder : 999;
+					const orderB = b.displayOrder !== undefined ? b.displayOrder : 999;
+					return orderA - orderB;
+				});
+				
+				productsArray.forEach((product, index) => {
 					let imagePath = product.image;
 					if (!imagePath && product.additionalImages && product.additionalImages.length > 0) {
 						imagePath = product.additionalImages[0];
@@ -1748,20 +1778,38 @@ document.createElement = function(tagName) {
 						statusHTML = '<span style="background-color: #6A0DAD; color: white; padding: 3px 8px; border-radius: 3px; font-weight: bold;">COMING SOON</span>';
 					}
 					
+					// Add visibility indicator and reordering controls
+					const visibilityStatus = product.hidden ? 
+						'<span style="background-color: #888; color: white; padding: 3px 8px; border-radius: 3px; margin-right: 5px;">HIDDEN</span>' : 
+						'<span style="background-color: #4CAF50; color: white; padding: 3px 8px; border-radius: 3px; margin-right: 5px;">VISIBLE</span>';
+					
 					const productItem = document.createElement('div');
 					productItem.className = 'product-item';
 					productItem.innerHTML = `
 						<div style="display: flex; justify-content: space-between; align-items: center; 
 									background: rgba(10, 14, 23, 0.8); padding: 15px; margin-bottom: 10px; 
 									border-radius: 5px; border: 1px solid var(--primary-color);">
-							<div>
+							<div style="display: flex; align-items: center; flex: 1;">
+								<span class="product-order" style="margin-right: 10px; font-weight: bold; min-width: 30px;">#${product.displayOrder || index + 1}</span>
 								<img src="${imagePath}" style="width: 50px; height: 50px; object-fit: cover; 
 														 border-radius: 5px; margin-right: 15px; 
 														 vertical-align: middle;">
 								<span style="font-weight: bold;">${product.name}</span>
 							</div>
-							<div>
+							<div style="display: flex; align-items: center;">
+								${visibilityStatus}
 								${statusHTML}
+								<div class="order-controls" style="margin: 0 10px;">
+									<button class="btn move-up-btn" data-product-id="${product.id}" style="margin-right: 5px;" title="Move Up">
+										↑
+									</button>
+									<button class="btn move-down-btn" data-product-id="${product.id}" style="margin-right: 5px;" title="Move Down">
+										↓
+									</button>
+								</div>
+								<button class="btn toggle-visibility-btn" data-product-id="${product.id}" style="margin-right: 5px;">
+									${product.hidden ? 'Show' : 'Hide'}
+								</button>
 								<button class="btn edit-product-btn" data-product-id="${product.id}" style="margin-right: 5px;">
 									Edit
 								</button>
@@ -1790,6 +1838,122 @@ document.createElement = function(tagName) {
 						deleteProduct(productId);
 					});
 				});
+				
+				// Add event listeners for visibility toggle
+				document.querySelectorAll('.toggle-visibility-btn').forEach(btn => {
+					btn.addEventListener('click', function() {
+						const productId = this.getAttribute('data-product-id');
+						toggleProductVisibility(productId);
+					});
+				});
+				
+				// Add event listeners for order controls
+				document.querySelectorAll('.move-up-btn').forEach(btn => {
+					btn.addEventListener('click', function(e) {
+						e.stopPropagation();
+						const productId = this.getAttribute('data-product-id');
+						moveProductUp(productId);
+					});
+				});
+				
+				document.querySelectorAll('.move-down-btn').forEach(btn => {
+					btn.addEventListener('click', function(e) {
+						e.stopPropagation();
+						const productId = this.getAttribute('data-product-id');
+						moveProductDown(productId);
+					});
+				});
+			}
+
+			function toggleProductVisibility(productId) {
+				const products = JSON.parse(localStorage.getItem('siteProducts') || '{}');
+				
+				if (products[productId]) {
+					// Toggle the hidden flag
+					products[productId].hidden = !products[productId].hidden;
+					
+					// Save updated products
+					localStorage.setItem('siteProducts', JSON.stringify(products));
+					
+					// Re-render product list
+					renderProductList(products);
+				}
+			}
+
+			function moveProductUp(productId) {
+				const products = JSON.parse(localStorage.getItem('siteProducts') || '{}');
+				
+				// Convert to array and ensure display order is set
+				const productsArray = Object.values(products);
+				
+				// Make sure all products have displayOrder
+				productsArray.forEach((product, index) => {
+					if (product.displayOrder === undefined) {
+						product.displayOrder = index + 1;
+					}
+				});
+				
+				// Sort by current display order
+				productsArray.sort((a, b) => a.displayOrder - b.displayOrder);
+				
+				// Find the product to move
+				const productIndex = productsArray.findIndex(p => p.id === productId);
+				
+				if (productIndex > 0) {
+					// Swap display orders with the product above it
+					const temp = productsArray[productIndex].displayOrder;
+					productsArray[productIndex].displayOrder = productsArray[productIndex - 1].displayOrder;
+					productsArray[productIndex - 1].displayOrder = temp;
+					
+					// Update the products object
+					productsArray.forEach(product => {
+						products[product.id] = product;
+					});
+					
+					// Save updated products
+					localStorage.setItem('siteProducts', JSON.stringify(products));
+					
+					// Re-render product list
+					renderProductList(products);
+				}
+			}
+
+			function moveProductDown(productId) {
+				const products = JSON.parse(localStorage.getItem('siteProducts') || '{}');
+				
+				// Convert to array and ensure display order is set
+				const productsArray = Object.values(products);
+				
+				// Make sure all products have displayOrder
+				productsArray.forEach((product, index) => {
+					if (product.displayOrder === undefined) {
+						product.displayOrder = index + 1;
+					}
+				});
+				
+				// Sort by current display order
+				productsArray.sort((a, b) => a.displayOrder - b.displayOrder);
+				
+				// Find the product to move
+				const productIndex = productsArray.findIndex(p => p.id === productId);
+				
+				if (productIndex < productsArray.length - 1) {
+					// Swap display orders with the product below it
+					const temp = productsArray[productIndex].displayOrder;
+					productsArray[productIndex].displayOrder = productsArray[productIndex + 1].displayOrder;
+					productsArray[productIndex + 1].displayOrder = temp;
+					
+					// Update the products object
+					productsArray.forEach(product => {
+						products[product.id] = product;
+					});
+					
+					// Save updated products
+					localStorage.setItem('siteProducts', JSON.stringify(products));
+					
+					// Re-render product list
+					renderProductList(products);
+				}
 			}
 
 			function setupDeliveryTypeHandler() {
@@ -1861,7 +2025,7 @@ document.createElement = function(tagName) {
 
 				// Update product type dropdown with current terminology
 				updateProductTypeDropdown();
-	
+
 				const isNewProduct = !product;
 				
 				// Set form values safely
@@ -1886,7 +2050,76 @@ document.createElement = function(tagName) {
 				safeSetValue('product-rarity', isNewProduct ? '' : (product.rarity || ''));
 				safeSetValue('product-details', isNewProduct ? '' : product.details);
 				safeSetValue('product-notes', isNewProduct ? '' : product.notes);
+				safeSetValue('product-enable-hover', isNewProduct ? 'false' : (product.enableHoverImage ? 'true' : 'false'));
+
+				// Set hidden flag - determine if product should be hidden
+				const isHidden = isNewProduct ? false : !!product.hidden;
 				
+				// Create or update the visibility control
+				let visibilityGroup = document.getElementById('product-visibility-group');
+				if (!visibilityGroup) {
+					// Create the element if it doesn't exist
+					visibilityGroup = document.createElement('div');
+					visibilityGroup.id = 'product-visibility-group';
+					visibilityGroup.className = 'form-group';
+					visibilityGroup.innerHTML = `
+						<label for="product-visibility" style="color: var(--secondary-color);">Product Visibility</label>
+						<select id="product-visibility">
+							<option value="visible" ${!isHidden ? 'selected' : ''}>Visible - Show in product list</option>
+							<option value="hidden" ${isHidden ? 'selected' : ''}>Hidden - Keep in database but don't display</option>
+						</select>
+						<p style="font-size: 0.8rem; color: #aaa; margin-top: 3px;">Hidden products are saved but not displayed on your site.</p>
+					`;
+					
+					// Find the right location to insert it - after product ID field
+					const productIdField = document.getElementById('product-id');
+					if (productIdField && productIdField.parentNode) {
+						const parentNode = productIdField.closest('.form-group').parentNode;
+						const productIdGroup = productIdField.closest('.form-group');
+						parentNode.insertBefore(visibilityGroup, productIdGroup.nextSibling);
+					}
+				} else {
+					// If it exists, just update the select value
+					const visibilitySelect = visibilityGroup.querySelector('select');
+					if (visibilitySelect) {
+						visibilitySelect.value = isHidden ? 'hidden' : 'visible';
+					}
+				}
+
+				const enableHoverSelect = document.getElementById('product-enable-hover');
+				const hoverImageGroup = document.getElementById('hover-image-group');
+				if (enableHoverSelect && hoverImageGroup) {
+					if (enableHoverSelect.value === 'true') {
+						hoverImageGroup.style.display = 'block';
+						
+						// Populate the hover image select
+						const hoverImageSelect = document.getElementById('product-hover-image');
+						if (hoverImageSelect) {
+							// Clear existing options except the default one
+							while (hoverImageSelect.options.length > 1) {
+								hoverImageSelect.remove(1);
+							}
+							
+							// Add options for each additional image
+							if (!isNewProduct && product.additionalImages) {
+								product.additionalImages.forEach((img, index) => {
+									const option = document.createElement('option');
+									option.value = img;
+									option.textContent = `Image ${index + 1}: ${img}`;
+									hoverImageSelect.appendChild(option);
+									
+									// Select the current hover image if it exists
+									if (product.hoverImage && product.hoverImage === img) {
+										option.selected = true;
+									}
+								});
+							}
+						}
+					} else {
+						hoverImageGroup.style.display = 'none';
+					}
+				}
+
 				// Set product type
 				const typeSelect = document.getElementById('product-type');
 				if (typeSelect && !isNewProduct) {
@@ -2019,6 +2252,48 @@ document.createElement = function(tagName) {
 					"deliveryType": currentDeliveryType,
 					"packOptionsSectionExists": !!packOptionsSection,
 					"packOptionsSectionDisplay": packOptionsSection ? packOptionsSection.style.display : 'N/A'
+				});
+			}
+
+			function setupHoverImageHandlers() {
+				const enableHoverSelect = document.getElementById('product-enable-hover');
+				const hoverImageGroup = document.getElementById('hover-image-group');
+				
+				if (enableHoverSelect) {
+					enableHoverSelect.addEventListener('change', function() {
+						if (this.value === 'true') {
+							hoverImageGroup.style.display = 'block';
+							updateHoverImageOptions();
+						} else {
+							hoverImageGroup.style.display = 'none';
+						}
+					});
+				}
+			}
+
+			// Function to update hover image options based on available additional images
+			function updateHoverImageOptions() {
+				const hoverImageSelect = document.getElementById('product-hover-image');
+				const additionalImages = [];
+				
+				// Get all additional images from the form
+				document.querySelectorAll('#additional-images input').forEach(input => {
+					if (input.value.trim()) {
+						additionalImages.push(input.value.trim());
+					}
+				});
+				
+				// Clear existing options except the default one
+				while (hoverImageSelect.options.length > 1) {
+					hoverImageSelect.remove(1);
+				}
+				
+				// Add options for each additional image
+				additionalImages.forEach((img, index) => {
+					const option = document.createElement('option');
+					option.value = img;
+					option.textContent = `Image ${index + 1}: ${img}`;
+					hoverImageSelect.appendChild(option);
 				});
 			}
 
@@ -2282,6 +2557,10 @@ document.createElement = function(tagName) {
 				const productDelivery = document.getElementById('product-delivery').value;
 				const digitalContent = document.getElementById('digital-content').value;
 				
+				// Get visibility status (add this)
+				const visibilitySelect = document.getElementById('product-visibility');
+				const isHidden = visibilitySelect ? visibilitySelect.value === 'hidden' : false;
+				
 				// Strip "img/" prefix if it exists
 				let productImage = document.getElementById('product-image').value;
 				if (productImage.startsWith('img/')) {
@@ -2319,23 +2598,47 @@ document.createElement = function(tagName) {
 				document.querySelectorAll('#pack-options .pack-option').forEach(packEl => {
 					const inputs = packEl.querySelectorAll('input');
 					
-					const size = inputs[0].value;
-					// Parse the values as floats first
-					const regularPrice = parseFloat(inputs[1].value);
-					const salePrice = parseFloat(inputs[2].value);
-					
-					if (size && !isNaN(regularPrice) && !isNaN(salePrice)) {
-						packOptions.push({
-							size,
-							// Store the exact values with 2 decimal places
-							regularPrice: regularPrice.toFixed(2),
-							salePrice: salePrice.toFixed(2)
-						});
+					if (inputs.length >= 3) {
+						const size = inputs[0].value.trim();
+						
+						// Handle the price values properly regardless of format
+						let regularPrice = inputs[1].value.trim();
+						let salePrice = inputs[2].value.trim();
+						
+						// If they're not empty, convert to numbers
+						if (size && regularPrice && salePrice) {
+							// Remove any quotes and convert to numbers
+							regularPrice = Number(regularPrice.replace(/"/g, ''));
+							salePrice = Number(salePrice.replace(/"/g, ''));
+							
+							// Add to pack options
+							packOptions.push({
+								size: size,
+								regularPrice: regularPrice,
+								salePrice: salePrice
+							});
+						}
 					}
 				});
 				
 				// Get products from localStorage
 				const products = JSON.parse(localStorage.getItem('siteProducts') || '{}');
+				
+				// If this is a new product, assign a display order at the end
+				let displayOrder;
+				if (!products[productId]) {
+					// Find the highest existing display order
+					const maxOrder = Object.values(products).reduce((max, product) => {
+						return product.displayOrder !== undefined && product.displayOrder > max ? 
+							product.displayOrder : max;
+					}, 0);
+					
+					// Set new product's order to maxOrder + 1
+					displayOrder = maxOrder + 1;
+				} else {
+					// Keep existing display order
+					displayOrder = products[productId].displayOrder;
+				}
 				
 				// Create or update product - maintain all fields
 				products[productId] = {
@@ -2354,7 +2657,12 @@ document.createElement = function(tagName) {
 					rarity: productRarity,
 					details: productDetails,
 					notes: productNotes,
-					packOptions: packOptions
+					packOptions: packOptions,
+					enableHoverImage: document.getElementById('product-enable-hover').value === 'true',
+					hoverImage: document.getElementById('product-enable-hover').value === 'true' ? 
+						document.getElementById('product-hover-image').value : '',
+					hidden: isHidden,  // Add the hidden flag
+					displayOrder: displayOrder  // Add the display order
 				};
 				
 				// For debugging - check what's being saved
@@ -3250,6 +3558,18 @@ document.createElement = function(tagName) {
 							}
 						});
 						
+						// Explicitly save background image fields to ensure they're captured
+						const backgroundImageField = document.getElementById('background-image');
+						const sectionImageField = document.getElementById('section-image');
+						
+						if (backgroundImageField) {
+							formValues['background-image'] = backgroundImageField.value;
+						}
+						
+						if (sectionImageField) {
+							formValues['section-image'] = sectionImageField.value;
+						}
+						
 						// Save navigation items separately
 						const navItems = [];
 						document.querySelectorAll('#nav-items .nav-item').forEach(item => {
@@ -3305,6 +3625,22 @@ document.createElement = function(tagName) {
 						input.addEventListener('input', saveFormValues);
 					});
 					
+					// Add specific listeners for background image fields to ensure they're saved
+					const backgroundImageField = document.getElementById('background-image');
+					const sectionImageField = document.getElementById('section-image');
+					
+					if (backgroundImageField) {
+						backgroundImageField.addEventListener('change', saveFormValues);
+						backgroundImageField.addEventListener('input', saveFormValues);
+						backgroundImageField.addEventListener('blur', saveFormValues); // Save on field blur too
+					}
+					
+					if (sectionImageField) {
+						sectionImageField.addEventListener('change', saveFormValues);
+						sectionImageField.addEventListener('input', saveFormValues);
+						sectionImageField.addEventListener('blur', saveFormValues); // Save on field blur too
+					}
+					
 					// Handle the preset theme selection
 					document.querySelectorAll('.preset-theme').forEach(theme => {
 						theme.addEventListener('click', function() {
@@ -3343,6 +3679,23 @@ document.createElement = function(tagName) {
 						const formValues = JSON.parse(savedValues);
 						console.log('Loading saved configuration');
 						
+						// Explicitly handle background and texture fields first to ensure they're loaded
+						if (formValues['background-image']) {
+							const backgroundField = document.getElementById('background-image');
+							if (backgroundField) {
+								backgroundField.value = formValues['background-image'];
+								console.log('Loaded background image:', formValues['background-image']);
+							}
+						}
+						
+						if (formValues['section-image']) {
+							const textureField = document.getElementById('section-image');
+							if (textureField) {
+								textureField.value = formValues['section-image'];
+								console.log('Loaded section image:', formValues['section-image']);
+							}
+						}
+						
 						// Loop through saved values and apply them to form elements
 						Object.keys(formValues).forEach(id => {
 							// Handle navigation items separately
@@ -3360,6 +3713,11 @@ document.createElement = function(tagName) {
 							// Handle active theme separately
 							if (id === 'active-theme') {
 								// We'll apply this later
+								return;
+							}
+							
+							// Skip background image fields as we handled them above
+							if (id === 'background-image' || id === 'section-image') {
 								return;
 							}
 							
@@ -3629,6 +3987,15 @@ document.createElement = function(tagName) {
 						
 						// Then setup auto-save functionality
 						setupAutoSave();
+						
+						setupHoverImageHandlers();
+
+						// Listen for changes to additional images to update hover image options
+						document.getElementById('additional-images').addEventListener('change', function() {
+							if (document.getElementById('product-enable-hover').value === 'true') {
+								updateHoverImageOptions();
+							}
+						});
 						
 						// Reset image prompt field when page loads
 						const imagePromptField = document.getElementById('image-prompt');
@@ -3970,6 +4337,12 @@ document.createElement = function(tagName) {
 						safeSetValue('analytics-id', config.advanced.analyticsId);
 					}
 					
+					// Handle background images specifically
+					if (config.background) {
+						safeSetValue('background-image', config.background.image || '');
+						safeSetValue('section-image', config.background.sectionImage || '');
+					}
+	
 					// Navigation items
 					if (config.navigation && config.navigation.length > 0) {
 						loadNavigationItems(config.navigation);
